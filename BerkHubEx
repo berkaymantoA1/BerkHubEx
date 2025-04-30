@@ -1,0 +1,180 @@
+local BerkHub = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local Execute = Instance.new("TextButton")
+local Clear = Instance.new("TextButton")
+local Input = Instance.new("TextBox")
+local UICorner = Instance.new("UICorner")
+local Title = Instance.new("TextLabel")
+local ExitButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
+local Shadow = Instance.new("ImageLabel")
+
+BerkHub.Name = "BerkHub"
+BerkHub.Parent = game.CoreGui
+
+-- Background Shadow for the Frame to make it pop out
+Shadow.Parent = BerkHub
+Shadow.BackgroundTransparency = 1
+Shadow.Position = UDim2.new(0.5, -210, 0.5, -160)
+Shadow.Size = UDim2.new(0, 420, 0, 460)
+Shadow.Image = "rbxassetid://3033103714" -- Soft shadow image
+Shadow.ImageTransparency = 0.7
+Shadow.ScaleType = Enum.ScaleType.Slice
+Shadow.SliceCenter = Rect.new(4, 4, 296, 296)
+
+Frame.Parent = BerkHub
+Frame.BackgroundColor3 = Color3.fromRGB(32, 32, 32) -- Dark, sleek background color
+Frame.Position = UDim2.new(0.5, -200, 0.5, -150)
+Frame.Size = UDim2.new(0, 400, 0, 450)
+
+UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.Parent = Frame
+
+-- Title with Gradient Background
+Title.Parent = Frame
+Title.Text = "BerkHub Executor"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 26
+Title.Font = Enum.Font.GothamBold
+Title.Position = UDim2.new(0.5, -120, 0, 10)
+Title.Size = UDim2.new(0, 240, 0, 30)
+Title.TextAlignment = Enum.TextAlignment.Center
+Title.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+Title.BackgroundTransparency = 0.5
+Title.TextStrokeTransparency = 0.6
+
+-- Input box with stylish effects
+Input.Parent = Frame
+Input.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Input.Position = UDim2.new(0, 10, 0, 50)
+Input.Size = UDim2.new(0, 380, 0, 250)
+Input.ClearTextOnFocus = false
+Input.Text = "-- Enter your script here"
+Input.TextColor3 = Color3.fromRGB(255, 255, 255)
+Input.TextWrapped = true
+Input.TextXAlignment = Enum.TextXAlignment.Left
+Input.TextYAlignment = Enum.TextYAlignment.Top
+Input.Font = Enum.Font.Code
+Input.TextSize = 16
+Input.MultiLine = true
+Input.TextTransparency = 0.5
+Input.PlaceholderText = "Enter your script here..."
+
+-- Adding cool hover effects to buttons
+Execute.Name = "Execute"
+Execute.Parent = Frame
+Execute.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+Execute.Position = UDim2.new(0, 10, 0, 320)
+Execute.Size = UDim2.new(0, 185, 0, 60)
+Execute.Text = "Execute"
+Execute.Font = Enum.Font.SourceSansBold
+Execute.TextSize = 22
+Execute.TextColor3 = Color3.fromRGB(255, 255, 255)
+Execute.TextTransparency = 0
+Execute.TextStrokeTransparency = 0.7
+
+Clear.Name = "Clear"
+Clear.Parent = Frame
+Clear.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+Clear.Position = UDim2.new(0, 205, 0, 320)
+Clear.Size = UDim2.new(0, 185, 0, 60)
+Clear.Text = "Clear"
+Clear.Font = Enum.Font.SourceSansBold
+Clear.TextSize = 22
+Clear.TextColor3 = Color3.fromRGB(255, 255, 255)
+Clear.TextTransparency = 0
+Clear.TextStrokeTransparency = 0.7
+
+-- Exit Button with a different color and hover effect
+ExitButton.Name = "ExitButton"
+ExitButton.Parent = Frame
+ExitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+ExitButton.Position = UDim2.new(0.5, -50, 0, 390)
+ExitButton.Size = UDim2.new(0, 100, 0, 40)
+ExitButton.Text = "Exit"
+ExitButton.Font = Enum.Font.SourceSansBold
+ExitButton.TextSize = 22
+ExitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Close Button (X) at the top-right corner with a smooth hover effect
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = Frame
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CloseButton.Position = UDim2.new(1, -30, 0, 10)
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Text = "X"
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.TextSize = 18
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Draggable feature
+local dragging = false
+local dragInput, mousePos, prevPos
+
+Frame.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        mousePos = input.Position
+        prevPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - mousePos
+        Frame.Position = UDim2.new(prevPos.X.Scale, prevPos.X.Offset + delta.X, prevPos.Y.Scale, prevPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Close Button functionality
+CloseButton.MouseButton1Click:Connect(function()
+    BerkHub:Destroy()
+end)
+
+-- Exit Button functionality
+ExitButton.MouseButton1Click:Connect(function()
+    BerkHub:Destroy()
+end)
+
+-- Button Functions with hover effects
+Execute.MouseButton1Click:Connect(function()
+    local scriptText = Input.Text
+    local success, err = pcall(function()
+        -- Execute the script logic
+        loadstring(scriptText)()
+    end)
+    if not success then
+        warn("Script error: "..err)
+    end
+end)
+
+Clear.MouseButton1Click:Connect(function()
+    Input.Text = ""
+end)
+
+-- Adding hover effects using TweenService for button animations
+local TweenService = game:GetService("TweenService")
+
+local function createHoverEffect(button)
+    button.MouseEnter:Connect(function()
+        local goal = {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}
+        local tween = TweenService:Create(button, TweenInfo.new(0.2), goal)
+        tween:Play()
+    end)
+    button.MouseLeave:Connect(function()
+        local goal = {BackgroundColor3 = button.BackgroundColor3}
+        local tween = TweenService:Create(button, TweenInfo.new(0.2), goal)
+        tween:Play()
+    end)
+end
+
+createHoverEffect(Execute)
+createHoverEffect(Clear)
+createHoverEffect(ExitButton)
+createHoverEffect(CloseButton)
