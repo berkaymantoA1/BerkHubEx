@@ -7,30 +7,34 @@ local UICorner = Instance.new("UICorner")
 local Title = Instance.new("TextLabel")
 local ExitButton = Instance.new("TextButton")
 local CloseButton = Instance.new("TextButton")
-local Shadow = Instance.new("ImageLabel")
+local Loading = Instance.new("Frame")
+local LoadingLabel = Instance.new("TextLabel")
+local TweenService = game:GetService("TweenService")
 
 BerkHub.Name = "BerkHub"
 BerkHub.Parent = game.CoreGui
 
--- Background Shadow for the Frame to make it pop out
+-- Frame background shadow
+local Shadow = Instance.new("ImageLabel")
 Shadow.Parent = BerkHub
 Shadow.BackgroundTransparency = 1
 Shadow.Position = UDim2.new(0.5, -210, 0.5, -160)
 Shadow.Size = UDim2.new(0, 420, 0, 460)
-Shadow.Image = "rbxassetid://3033103714" -- Soft shadow image
+Shadow.Image = "rbxassetid://3033103714"
 Shadow.ImageTransparency = 0.7
 Shadow.ScaleType = Enum.ScaleType.Slice
 Shadow.SliceCenter = Rect.new(4, 4, 296, 296)
 
+-- Main Frame
 Frame.Parent = BerkHub
-Frame.BackgroundColor3 = Color3.fromRGB(32, 32, 32) -- Dark, sleek background color
+Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 Frame.Position = UDim2.new(0.5, -200, 0.5, -150)
 Frame.Size = UDim2.new(0, 400, 0, 450)
 
 UICorner.CornerRadius = UDim.new(0, 15)
 UICorner.Parent = Frame
 
--- Title with Gradient Background
+-- Title
 Title.Parent = Frame
 Title.Text = "BerkHub Executor"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -43,13 +47,13 @@ Title.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 Title.BackgroundTransparency = 0.5
 Title.TextStrokeTransparency = 0.6
 
--- Input box with stylish effects
+-- Input box
 Input.Parent = Frame
 Input.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 Input.Position = UDim2.new(0, 10, 0, 50)
 Input.Size = UDim2.new(0, 380, 0, 250)
 Input.ClearTextOnFocus = false
-Input.Text = "-- Enter your script here"
+Input.Text = "-- Enter script here"
 Input.TextColor3 = Color3.fromRGB(255, 255, 255)
 Input.TextWrapped = true
 Input.TextXAlignment = Enum.TextXAlignment.Left
@@ -57,10 +61,8 @@ Input.TextYAlignment = Enum.TextYAlignment.Top
 Input.Font = Enum.Font.Code
 Input.TextSize = 16
 Input.MultiLine = true
-Input.TextTransparency = 0.5
-Input.PlaceholderText = "Enter your script here..."
 
--- Adding cool hover effects to buttons
+-- Buttons
 Execute.Name = "Execute"
 Execute.Parent = Frame
 Execute.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
@@ -70,8 +72,6 @@ Execute.Text = "Execute"
 Execute.Font = Enum.Font.SourceSansBold
 Execute.TextSize = 22
 Execute.TextColor3 = Color3.fromRGB(255, 255, 255)
-Execute.TextTransparency = 0
-Execute.TextStrokeTransparency = 0.7
 
 Clear.Name = "Clear"
 Clear.Parent = Frame
@@ -82,10 +82,7 @@ Clear.Text = "Clear"
 Clear.Font = Enum.Font.SourceSansBold
 Clear.TextSize = 22
 Clear.TextColor3 = Color3.fromRGB(255, 255, 255)
-Clear.TextTransparency = 0
-Clear.TextStrokeTransparency = 0.7
 
--- Exit Button with a different color and hover effect
 ExitButton.Name = "ExitButton"
 ExitButton.Parent = Frame
 ExitButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
@@ -96,7 +93,6 @@ ExitButton.Font = Enum.Font.SourceSansBold
 ExitButton.TextSize = 22
 ExitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 
--- Close Button (X) at the top-right corner with a smooth hover effect
 CloseButton.Name = "CloseButton"
 CloseButton.Parent = Frame
 CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
@@ -106,6 +102,22 @@ CloseButton.Text = "X"
 CloseButton.Font = Enum.Font.SourceSansBold
 CloseButton.TextSize = 18
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Loading animation frame
+Loading.Parent = BerkHub
+Loading.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Loading.BackgroundTransparency = 0.5
+Loading.Size = UDim2.new(0, 200, 0, 50)
+Loading.Position = UDim2.new(0.5, -100, 0.5, -25)
+Loading.Visible = false
+
+LoadingLabel.Parent = Loading
+LoadingLabel.Text = "Loading..."
+LoadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+LoadingLabel.TextSize = 20
+LoadingLabel.Font = Enum.Font.SourceSansBold
+LoadingLabel.Size = UDim2.new(1, 0, 1, 0)
+LoadingLabel.TextAlignment = Enum.TextAlignment.Center
 
 -- Draggable feature
 local dragging = false
@@ -145,10 +157,13 @@ end)
 -- Button Functions with hover effects
 Execute.MouseButton1Click:Connect(function()
     local scriptText = Input.Text
+    Loading.Visible = true
     local success, err = pcall(function()
-        -- Execute the script logic
+        -- Simulate loading time before executing the script
+        wait(2) -- Wait for 2 seconds to show the loading animation
         loadstring(scriptText)()
     end)
+    Loading.Visible = false
     if not success then
         warn("Script error: "..err)
     end
@@ -159,8 +174,6 @@ Clear.MouseButton1Click:Connect(function()
 end)
 
 -- Adding hover effects using TweenService for button animations
-local TweenService = game:GetService("TweenService")
-
 local function createHoverEffect(button)
     button.MouseEnter:Connect(function()
         local goal = {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}
